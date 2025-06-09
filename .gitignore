@@ -383,4 +383,14 @@ FodyWeavers.xsd
 .idea/
 
 # Custom: Application specific files
+*.log
+
+# User-specific files
+*.user
+*.suo
+
+# Credentials - NEVER commit these files
+twilio-credentials.json
+
+# Logs
 *.log 

@@ -4,9 +4,10 @@ namespace PerfumeMonitor.Models
     {
         public string Name { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
-        public bool IsAvailable { get; set; }
-        public DateTime LastChecked { get; set; }
-        public string LastStatus { get; set; } = "Nunca verificado";
+        public bool IsAvailable { get; set; } = false;
+        public DateTime LastChecked { get; set; } = DateTime.Now;
+        public string LastStatus { get; set; } = "Não verificado";
+        public DateTime LastWhatsAppNotification { get; set; } = DateTime.MinValue;
 
         public PerfumeUrl() { }
 
@@ -14,8 +15,9 @@ namespace PerfumeMonitor.Models
         {
             Name = name;
             Url = url;
-            IsAvailable = false;
-            LastChecked = DateTime.MinValue;
+            LastChecked = DateTime.Now;
+            LastStatus = "Não verificado";
+            LastWhatsAppNotification = DateTime.MinValue;
         }
     }
 } 

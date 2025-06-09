@@ -8,7 +8,9 @@ namespace PerfumeMonitor.Forms
         private NotifyIcon _notifyIcon;
         private System.Windows.Forms.Timer _monitorTimer;
         private ConfigManager _configManager;
+        private CredentialsManager _credentialsManager;
         private PerfumeChecker _perfumeChecker;
+        private WhatsAppNotifier _whatsAppNotifier;
         private List<PerfumeUrl> _perfumeUrls;
         private bool _isMonitoring = true;
 
@@ -28,7 +30,12 @@ namespace PerfumeMonitor.Forms
         private void InitializeServices()
         {
             _configManager = new ConfigManager();
+            _credentialsManager = new CredentialsManager();
             _perfumeChecker = new PerfumeChecker();
+            
+            var config = _configManager.LoadConfig();
+            var credentials = _credentialsManager.LoadCredentials();
+            _whatsAppNotifier = new WhatsAppNotifier(config.WhatsApp, credentials);
         }
 
         private void InitializeTrayIcon()
@@ -41,6 +48,7 @@ namespace PerfumeMonitor.Forms
             var contextMenu = new ContextMenuStrip();
             contextMenu.Items.Add("Mostrar", null, ShowForm);
             contextMenu.Items.Add("Configurações", null, ShowConfig);
+            contextMenu.Items.Add("WhatsApp", null, ShowWhatsAppConfig);
             contextMenu.Items.Add("-");
             contextMenu.Items.Add(_isMonitoring ? "Pausar" : "Retomar", null, ToggleMonitoring);
             contextMenu.Items.Add("-");
@@ -172,12 +180,21 @@ namespace PerfumeMonitor.Forms
             }
         }
 
-        private void ShowAvailabilityNotification(PerfumeUrl perfume)
+        private async void ShowAvailabilityNotification(PerfumeUrl perfume)
         {
             _notifyIcon.ShowBalloonTip(5000, 
                 "Perfume Disponível!", 
                 $"{perfume.Name} está disponível para compra!",
                 ToolTipIcon.Info);
+
+            try
+            {
+                await _whatsAppNotifier.SendNotificationAsync(perfume);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro ao enviar WhatsApp: {ex.Message}");
+            }
 
             if (this.InvokeRequired)
             {
@@ -218,6 +235,18 @@ namespace PerfumeMonitor.Forms
                 LoadConfiguration();
                 UpdateTimerInterval();
                 UpdateUI();
+            }
+        }
+
+        private void ShowWhatsAppConfig(object? sender, EventArgs e)
+        {
+            using (var whatsAppForm = new WhatsAppConfigForm())
+            {
+                whatsAppForm.ShowDialog();
+                
+                var config = _configManager.LoadConfig();
+                var credentials = _credentialsManager.LoadCredentials();
+                _whatsAppNotifier = new WhatsAppNotifier(config.WhatsApp, credentials);
             }
         }
 
@@ -295,5 +324,7 @@ namespace PerfumeMonitor.Forms
             }
             base.Dispose(disposing);
         }
+
+
     }
 } 
