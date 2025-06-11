@@ -23,4 +23,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PerfumeMonitor.Shared\PerfumeMonitor.Shared.csproj" />
+  </ItemGroup>
+
 </Project> 

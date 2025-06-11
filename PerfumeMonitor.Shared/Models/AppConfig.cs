@@ -1,4 +1,4 @@
-namespace PerfumeMonitor.Models
+namespace PerfumeMonitor.Shared.Models
 {
     public class AppConfig
     {

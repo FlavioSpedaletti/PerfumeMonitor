@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Painel Administrativo - Monitor de Perfumes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #495057;
+            transition: all 0.3s;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .nav-tab.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #007bff;
+        }
+
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .perfume-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .perfume-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .perfume-item.unavailable {
+            border-left-color: #dc3545;
+        }
+
+        .perfume-item.error {
+            border-left-color: #ffc107;
+        }
+
+        .perfume-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .perfume-url {
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-all;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .perfume-status {
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-unavailable {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-error {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .config-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.online {
+            background: #28a745;
+        }
+
+        .status-indicator.offline {
+            background: #dc3545;
+        }
+
+        .status-indicator.checking {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Painel Administrativo</h1>
+            <p>Gerencie todos os aspectos do Monitor de Perfumes</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('perfumes')">🌟 Perfumes</button>
+            <button class="nav-tab" onclick="showTab('config')">⚙️ Configurações</button>
+            <button class="nav-tab" onclick="showTab('whatsapp')">📱 WhatsApp</button>
+            <button class="nav-tab" onclick="showTab('system')">📊 Sistema</button>
+        </div>
+
+        <!-- Tab Perfumes -->
+        <div id="perfumes" class="tab-content active">
+            <div class="section">
+                <h3>➕ Adicionar Novo Perfume</h3>
+                <div class="row">
+                    <div>
+                        <div class="form-group">
+                            <label for="perfumeName">Nome do Perfume:</label>
+                            <input type="text" id="perfumeName" class="form-control" placeholder="Ex: Stella Dustin - Marine Alloy">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="perfumeUrl">URL do Produto:</label>
+                            <input type="url" id="perfumeUrl" class="form-control" placeholder="https://exemplo.com/perfume">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="addPerfume()">➕ Adicionar Perfume</button>
+            </div>
+
+            <div class="section">
+                <h3>📋 Lista de Perfumes Monitorados</h3>
+                <div id="perfumesList" class="perfume-list">
+                    <div class="loading">Carregando perfumes...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Configurações -->
+        <div id="config" class="tab-content">
+            <div class="section">
+                <h3>⏱️ Configurações de Monitoramento</h3>
+                <div class="form-group">
+                    <label for="checkInterval">Intervalo de Verificação (minutos):</label>
+                    <input type="number" id="checkInterval" class="form-control" min="1" max="1440" value="5">
+                </div>
+                <button class="btn btn-primary" onclick="updateInterval()">💾 Salvar Intervalo</button>
+            </div>
+
+            <div class="section">
+                <h3>📊 Status Atual do Sistema</h3>
+                <div id="systemConfig" class="config-grid">
+                    <div class="loading">Carregando configurações...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab WhatsApp -->
+        <div id="whatsapp" class="tab-content">
+            <div class="section">
+                <h3>📱 Configurações WhatsApp</h3>
+                <div class="row">
+                    <div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="whatsappEnabled">
+                            <label for="whatsappEnabled">Habilitar notificações WhatsApp</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxNotifications">Máximo de notificações por dia:</label>
+                            <input type="number" id="maxNotifications" class="form-control" min="1" max="100" value="10">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="cooldownMinutes">Cooldown entre notificações (minutos):</label>
+                            <input type="number" id="cooldownMinutes" class="form-control" min="1" max="1440" value="30">
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="reduceNightTime">
+                            <label for="reduceNightTime">Reduzir verificações noturnas</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="updateWhatsAppConfig()">💾 Salvar Configurações WhatsApp</button>
+            </div>
+        </div>
+
+        <!-- Tab Sistema -->
+        <div id="system" class="tab-content">
+            <div class="section">
+                <h3>🔧 Ações do Sistema</h3>
+                <div class="row">
+                    <div>
+                        <h4>Verificações</h4>
+                        <button class="btn btn-success" onclick="forceCheckAll()">🔍 Verificar Todos os Perfumes</button>
+                        <button class="btn btn-info" onclick="refreshData()">🔄 Atualizar Dados</button>
+                    </div>
+                    <div>
+                        <h4>Informações</h4>
+                        <button class="btn btn-info" onclick="showSystemStatus()">📊 Status Detalhado</button>
+                        <button class="btn btn-warning" onclick="viewLogs()">📝 Ver Logs</button>
+                        <button class="btn btn-success" onclick="testWhatsApp()">📱 Testar WhatsApp</button>
+                        <button class="btn btn-info" onclick="checkWhatsAppStatus()">🔍 Status WhatsApp</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📈 Monitoramento em Tempo Real</h3>
+                <div id="realtimeStatus">
+                    <div class="loading">Carregando status...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensagens de Feedback -->
+    <div id="alertContainer" style="position: fixed; top: 20px; right: 20px; z-index: 1000; max-width: 400px;"></div>
+
+    <script>
+        // Cache busting
+        const APP_VERSION = new Date().getTime();
+
+        // Variáveis globais
+        let currentTab = 'perfumes';
+        let autoRefreshInterval;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInitialData();
+            startAutoRefresh();
+        });
+
+        // Gerenciamento de Tabs
+        function showTab(tabName) {
+            // Remover active de todas as tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Ativar tab selecionada
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            currentTab = tabName;
+            loadTabData(tabName);
+        }
+
+        // Carregar dados da tab
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'perfumes':
+                    loadPerfumes();
+                    break;
+                case 'config':
+                    loadConfig();
+                    break;
+                case 'whatsapp':
+                    loadWhatsAppConfig();
+                    break;
+                case 'system':
+                    loadSystemStatus();
+                    break;
+            }
+        }
+
+        // Carregar dados iniciais
+        function loadInitialData() {
+            loadPerfumes();
+            loadConfig();
+        }
+
+        // Auto refresh
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(() => {
+                if (currentTab === 'system') {
+                    loadSystemStatus();
+                }
+                loadPerfumes(); // Sempre atualizar perfumes
+            }, 5000); // 5 segundos
+        }
+
+        // Utilitários para cache busting
+        function apiUrl(endpoint) {
+            const cacheBuster = Date.now();
+            return `${endpoint}?_=${cacheBuster}`;
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.getElementById('alertContainer');
+            container.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // === FUNÇÕES DE PERFUMES ===
+        async function loadPerfumes() {
+            try {
+                const response = await fetch(apiUrl('/api/perfumes'));
+                const perfumes = await response.json();
+                
+                const listDiv = document.getElementById('perfumesList');
+                
+                if (perfumes.length === 0) {
+                    listDiv.innerHTML = '<div class="loading">Nenhum perfume configurado.</div>';
+                    return;
+                }
+
+                listDiv.innerHTML = perfumes.map((perfume, index) => {
+                    let itemClass = 'perfume-item';
+                    let statusClass = 'perfume-status';
+                    let statusText = perfume.lastStatus;
+
+                    if (perfume.lastStatus.toLowerCase().includes('erro')) {
+                        itemClass += ' error';
+                        statusClass += ' status-error';
+                    } else if (perfume.isAvailable) {
+                        itemClass += ' available';
+                        statusClass += ' status-available';
+                    } else {
+                        itemClass += ' unavailable';
+                        statusClass += ' status-unavailable';
+                    }
+
+                    const lastChecked = new Date(perfume.lastChecked).toLocaleString('pt-BR');
+                    
+                    return `
+                        <div class="${itemClass}">
+                            <div class="perfume-name">${perfume.name}</div>
+                            <a href="${perfume.url}" target="_blank" class="perfume-url">${perfume.url}</a>
+                            <div class="${statusClass}">${statusText}</div>
+                            <div>
+                                <strong>Última verificação:</strong> ${lastChecked}<br>
+                                <strong>Disponível:</strong> ${perfume.isAvailable ? 'Sim' : 'Não'}
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <button class="btn btn-info" onclick="checkPerfume(${index})">🔍 Verificar</button>
+                                <button class="btn btn-danger" onclick="removePerfume(${index})">🗑️ Remover</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Erro ao carregar perfumes:', error);
+                showAlert('Erro ao carregar perfumes', 'danger');
+            }
+        }
+
+        async function addPerfume() {
+            const name = document.getElementById('perfumeName').value.trim();
+            const url = document.getElementById('perfumeUrl').value.trim();
+
+            if (!name || !url) {
+                showAlert('Nome e URL são obrigatórios', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/perfumes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, url })
+                });
+
+                if (response.ok) {
+                    showAlert('Perfume adicionado com sucesso!', 'success');
+                    document.getElementById('perfumeName').value = '';
+                    document.getElementById('perfumeUrl').value = '';
+                    loadPerfumes();
+                } else {
+                    const error = await response.text();
+                    showAlert(`Erro: ${error}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar perfume:', error);
+                showAlert('Erro ao adicionar perfume', 'danger');
+            }
+        }
+
+        async function removePerfume(index) {
+            if (!confirm('Tem certeza que deseja remover este perfume?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/perfumes/${index}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('Perfume removido com sucesso!', 'success');
+                    loadPerfumes();
+                } else {
+                    showAlert('Erro ao remover perfume', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao remover perfume:', error);
+                showAlert('Erro ao remover perfume', 'danger');
+            }
+        }
+
+        async function checkPerfume(index) {
+            try {
+                showAlert('Verificando perfume...', 'info');
+                const response = await fetch(`/api/perfumes/${index}/check`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert(`Verificação concluída: ${result.lastStatus}`, 'success');
+                    loadPerfumes();
+                } else {
+                    showAlert('Erro ao verificar perfume', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao verificar perfume:', error);
+                showAlert('Erro ao verificar perfume', 'danger');
+            }
+        }
+
+        // === FUNÇÕES DE CONFIGURAÇÃO ===
+        async function loadConfig() {
+            try {
+                const response = await fetch(apiUrl('/api/config'));
+                const config = await response.json();
+                
+                document.getElementById('checkInterval').value = config.checkIntervalMinutes;
+                
+                const statusResponse = await fetch(apiUrl('/api/config/status'));
+                const status = await statusResponse.json();
+                
+                const configDiv = document.getElementById('systemConfig');
+                configDiv.innerHTML = `
+                    <div class="config-card">
+                        <h4>📊 Estatísticas</h4>
+                        <p><strong>Perfumes:</strong> ${status.perfumeCount}</p>
+                        <p><strong>Intervalo:</strong> ${status.checkIntervalMinutes} min</p>
+                        <p><strong>Última atualização:</strong> ${new Date(status.lastUpdate).toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div class="config-card">
+                        <h4>📱 WhatsApp</h4>
+                        <p><span class="status-indicator ${status.whatsAppEnabled ? 'online' : 'offline'}"></span>
+                        <strong>Status:</strong> ${status.whatsAppEnabled ? 'Habilitado' : 'Desabilitado'}</p>
+                        <p><span class="status-indicator ${status.twilioConfigured ? 'online' : 'offline'}"></span>
+                        <strong>Twilio:</strong> ${status.twilioConfigured ? 'Configurado' : 'Não configurado'}</p>
+                    </div>
+                    <div class="config-card">
+                        <h4>🔍 Monitoramento</h4>
+                        <p><span class="status-indicator ${status.isCheckingNow ? 'checking' : 'online'}"></span>
+                        <strong>Status:</strong> ${status.isCheckingNow ? 'Verificando...' : 'Em espera'}</p>
+                        <p><strong>Último check:</strong> ${status.lastCheckCompleted ? new Date(status.lastCheckCompleted).toLocaleString('pt-BR') : 'Nunca'}</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar configurações:', error);
+                showAlert('Erro ao carregar configurações', 'danger');
+            }
+        }
+
+        async function updateInterval() {
+            const interval = parseInt(document.getElementById('checkInterval').value);
+            
+            if (interval < 1) {
+                showAlert('Intervalo deve ser maior que 0', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/config/interval', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(interval)
+                });
+
+                if (response.ok) {
+                    showAlert('Intervalo atualizado com sucesso!', 'success');
+                    loadConfig();
+                } else {
+                    showAlert('Erro ao atualizar intervalo', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar intervalo:', error);
+                showAlert('Erro ao atualizar intervalo', 'danger');
+            }
+        }
+
+        // === FUNÇÕES WHATSAPP ===
+        async function loadWhatsAppConfig() {
+            try {
+                const response = await fetch(apiUrl('/api/config'));
+                const config = await response.json();
+                
+                document.getElementById('whatsappEnabled').checked = config.whatsApp.isEnabled;
+                document.getElementById('maxNotifications').value = config.whatsApp.maxDailyNotifications;
+                document.getElementById('cooldownMinutes').value = config.whatsApp.cooldownMinutes;
+                document.getElementById('reduceNightTime').checked = config.whatsApp.reduceNightTimeChecks;
+            } catch (error) {
+                console.error('Erro ao carregar configurações WhatsApp:', error);
+                showAlert('Erro ao carregar configurações WhatsApp', 'danger');
+            }
+        }
+
+        async function updateWhatsAppConfig() {
+            const whatsAppConfig = {
+                isEnabled: document.getElementById('whatsappEnabled').checked,
+                maxDailyNotifications: parseInt(document.getElementById('maxNotifications').value),
+                cooldownMinutes: parseInt(document.getElementById('cooldownMinutes').value),
+                reduceNightTimeChecks: document.getElementById('reduceNightTime').checked
+            };
+
+            try {
+                const response = await fetch('/api/config/whatsapp', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(whatsAppConfig)
+                });
+
+                if (response.ok) {
+                    showAlert('Configurações WhatsApp atualizadas!', 'success');
+                    loadConfig();
+                } else {
+                    showAlert('Erro ao atualizar configurações WhatsApp', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar WhatsApp:', error);
+                showAlert('Erro ao atualizar configurações WhatsApp', 'danger');
+            }
+        }
+
+        // === FUNÇÕES DO SISTEMA ===
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch(apiUrl('/api/config/status'));
+                const status = await response.json();
+                
+                const statusDiv = document.getElementById('realtimeStatus');
+                statusDiv.innerHTML = `
+                    <div class="config-grid">
+                        <div class="config-card">
+                            <h4>🔍 Status de Verificação</h4>
+                            <p><span class="status-indicator ${status.isCheckingNow ? 'checking' : 'online'}"></span>
+                            ${status.isCheckingNow ? 
+                                `Verificando: ${status.currentPerfumeName} (${status.currentPerfumeIndex}/${status.totalPerfumes})` :
+                                'Sistema em espera'
+                            }</p>
+                            <p><strong>Iniciado:</strong> ${status.lastCheckStarted ? new Date(status.lastCheckStarted).toLocaleString('pt-BR') : 'N/A'}</p>
+                            <p><strong>Concluído:</strong> ${status.lastCheckCompleted ? new Date(status.lastCheckCompleted).toLocaleString('pt-BR') : 'N/A'}</p>
+                        </div>
+                        <div class="config-card">
+                            <h4>📊 Estatísticas Gerais</h4>
+                            <p><strong>Total de perfumes:</strong> ${status.perfumeCount}</p>
+                            <p><strong>Intervalo atual:</strong> ${status.checkIntervalMinutes} minutos</p>
+                            <p><strong>WhatsApp:</strong> ${status.whatsAppEnabled ? '✅ Ativo' : '❌ Inativo'}</p>
+                            <p><strong>Twilio:</strong> ${status.twilioConfigured ? '✅ Configurado' : '❌ Não configurado'}</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar status do sistema:', error);
+                showAlert('Erro ao carregar status do sistema', 'danger');
+            }
+        }
+
+        async function forceCheckAll() {
+            try {
+                showAlert('Iniciando verificação de todos os perfumes...', 'info');
+                const response = await fetch('/api/perfumes/check-all', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert(`Verificação iniciada! ${result.perfumeCount} perfumes serão verificados.`, 'success');
+                } else {
+                    showAlert('Erro ao iniciar verificação', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao forçar verificação:', error);
+                showAlert('Erro ao iniciar verificação', 'danger');
+            }
+        }
+
+        function refreshData() {
+            loadTabData(currentTab);
+            showAlert('Dados atualizados!', 'success');
+        }
+
+        function showSystemStatus() {
+            showTab('system');
+        }
+
+        function viewLogs() {
+            showAlert('Feature de logs será implementada em breve', 'info');
+        }
+
+        async function testWhatsApp() {
+            try {
+                showAlert('Testando WhatsApp...', 'info');
+                
+                const response = await fetch('/api/test/whatsapp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.testSent) {
+                        showAlert('✅ Teste de WhatsApp enviado com sucesso!', 'success');
+                    } else {
+                        showAlert(`❌ Teste falhou: ${result.message}`, 'danger');
+                    }
+                    console.log('Resultado do teste WhatsApp:', result);
+                } else {
+                    showAlert('Erro ao executar teste de WhatsApp', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro no teste WhatsApp:', error);
+                showAlert('Erro ao executar teste de WhatsApp', 'danger');
+            }
+        }
+
+        async function checkWhatsAppStatus() {
+            try {
+                const response = await fetch('/api/test/whatsapp-status');
+                
+                if (response.ok) {
+                    const status = await response.json();
+                    
+                    const statusWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+                    statusWindow.document.write(`
+                        <html>
+                        <head><title>Status WhatsApp Detalhado</title></head>
+                        <body style="font-family: monospace; padding: 20px;">
+                            <h2>📱 Status WhatsApp Detalhado</h2>
+                            <pre>${JSON.stringify(status, null, 2)}</pre>
+                        </body>
+                        </html>
+                    `);
+                    statusWindow.document.close();
+                } else {
+                    showAlert('Erro ao obter status WhatsApp', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status WhatsApp:', error);
+                showAlert('Erro ao verificar status WhatsApp', 'danger');
+            }
+        }
+    </script>
+</body>
+</html> 

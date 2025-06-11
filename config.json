@@ -1,0 +1,35 @@
+{
+  "PerfumeUrls": [
+    {
+      "Name": "Stella Dustin - Silver Alloy",
+      "Url": "https://www.thekingofparfums.com.br/produtos/stella-dustin-silver-alloy/",
+      "IsAvailable": false,
+      "LastChecked": "2025-06-11T16:35:37.9223657-03:00",
+      "LastStatus": "Esgotado",
+      "LastWhatsAppNotification": "0001-01-01T00:00:00"
+    },
+    {
+      "Name": "Stella Dustin - Marine Alloy",
+      "Url": "https://www.thekingofparfums.com.br/produtos/stella-dustin-marine-alloy/",
+      "IsAvailable": false,
+      "LastChecked": "2025-06-11T16:35:39.8044947-03:00",
+      "LastStatus": "Esgotado",
+      "LastWhatsAppNotification": "0001-01-01T00:00:00"
+    },
+    {
+      "Name": "nauti",
+      "Url": "https://www.thekingofparfums.com.br/produtos/nautica-kit-voyage/?variant=1090162962",
+      "IsAvailable": true,
+      "LastChecked": "2025-06-11T16:35:41.4596966-03:00",
+      "LastStatus": "Dispon\u00EDvel",
+      "LastWhatsAppNotification": "2025-06-11T16:29:27.0137401-03:00"
+    }
+  ],
+  "CheckIntervalMinutes": 1,
+  "WhatsApp": {
+    "IsEnabled": true,
+    "MaxDailyNotifications": 10,
+    "CooldownMinutes": 30,
+    "ReduceNightTimeChecks": true
+  }
+}

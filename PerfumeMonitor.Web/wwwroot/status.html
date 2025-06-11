@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Monitor de Perfumes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid #ddd;
+            transition: transform 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .status-card.available {
+            border-left-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #f8fff8 100%);
+        }
+
+        .status-card.unavailable {
+            border-left-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #fff8f8 100%);
+        }
+
+        .status-card.error {
+            border-left-color: #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #fffef8 100%);
+        }
+
+        .perfume-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .perfume-status {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-unavailable {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-error {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .perfume-details {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .perfume-url {
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .perfume-url:hover {
+            text-decoration: underline;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #007bff;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .system-status {
+            background: #e9ecef;
+            padding: 20px;
+            margin: 20px 30px;
+            border-radius: 10px;
+            border-left: 5px solid #6c757d;
+        }
+
+        .system-status h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .status-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .monitoring-status {
+            background: #e3f2fd;
+            padding: 20px;
+            margin: 20px 30px;
+            border-radius: 10px;
+            border-left: 5px solid #2196f3;
+            border: none;
+        }
+
+        .monitoring-status.checking {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { background-color: #fff3e0; }
+            50% { background-color: #ffcc80; }
+            100% { background-color: #fff3e0; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .checking-text {
+            font-weight: bold;
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+
+        .current-perfume {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Monitor de Perfumes</h1>
+            <p>Acompanhe a disponibilidade dos seus perfumes favoritos em tempo real</p>
+        </div>
+
+        <div class="monitoring-status" id="monitoringStatus">
+            <div id="monitoringStatusContent">
+                <div class="loading">Carregando status de monitoramento...</div>
+            </div>
+        </div>
+
+        <div class="system-status">
+            <h3>Status do Sistema</h3>
+            <div class="status-info" id="systemStatus">
+                <div class="loading">Carregando informações do sistema...</div>
+            </div>
+        </div>
+
+        <div id="perfumesList" class="status-grid">
+            <div class="loading">Carregando perfumes...</div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()" title="Atualizar">
+        🔄
+    </button>
+
+    <button class="refresh-btn" onclick="forceCheck()" title="Verificar Agora" style="bottom: 100px; background: #28a745;">
+        🔍
+    </button>
+
+    <script>
+        // Cache busting - versão da aplicação
+        const APP_VERSION = new Date().getTime();
+        console.log(`Monitor de Perfumes v${APP_VERSION} iniciado`);
+
+        async function loadData() {
+            try {
+                await Promise.all([loadSystemStatus(), loadPerfumes()]);
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+
+        async function loadSystemStatus() {
+            try {
+                // Cache busting para APIs
+                const cacheBuster = Date.now();
+                const response = await fetch(`/api/config/status?_=${cacheBuster}`);
+                const status = await response.json();
+                
+                // Atualizar status de monitoramento
+                updateMonitoringStatus(status);
+                
+                const systemStatusDiv = document.getElementById('systemStatus');
+                systemStatusDiv.innerHTML = `
+                    <div class="info-item">
+                        <div class="info-value">${status.perfumeCount}</div>
+                        <div class="info-label">Perfumes Monitorados</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${status.checkIntervalMinutes}min</div>
+                        <div class="info-label">Intervalo de Verificação</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${status.whatsAppEnabled ? '✅' : '❌'}</div>
+                        <div class="info-label">WhatsApp</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${status.twilioConfigured ? '✅' : '❌'}</div>
+                        <div class="info-label">Twilio Configurado</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar status do sistema:', error);
+            }
+        }
+
+        function updateMonitoringStatus(status) {
+            const monitoringStatusDiv = document.getElementById('monitoringStatus');
+            const contentDiv = document.getElementById('monitoringStatusContent');
+            
+            if (status.isCheckingNow) {
+                monitoringStatusDiv.className = 'monitoring-status checking';
+                
+                const progress = status.totalPerfumes > 0 ? 
+                    Math.round((status.currentPerfumeIndex / status.totalPerfumes) * 100) : 0;
+                
+                contentDiv.innerHTML = `
+                    <div class="checking-text">🔍 Verificação em andamento...</div>
+                    <div class="current-perfume">
+                        Verificando: ${status.currentPerfumeName || 'Preparando...'}
+                        (${status.currentPerfumeIndex}/${status.totalPerfumes})
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                `;
+            } else {
+                monitoringStatusDiv.className = 'monitoring-status';
+                
+                const lastCheck = status.lastCheckCompleted ? 
+                    new Date(status.lastCheckCompleted).toLocaleString('pt-BR') : 'Nunca';
+                
+                contentDiv.innerHTML = `
+                    <div style="font-weight: bold; color: #2196f3; margin-bottom: 10px;">
+                        ✅ Sistema em espera
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666;">
+                        Última verificação: ${lastCheck}
+                    </div>
+                `;
+            }
+        }
+
+        async function loadPerfumes() {
+            try {
+                // Cache busting para APIs
+                const cacheBuster = Date.now();
+                const response = await fetch(`/api/perfumes?_=${cacheBuster}`);
+                const perfumes = await response.json();
+                
+                const perfumesListDiv = document.getElementById('perfumesList');
+                
+                if (perfumes.length === 0) {
+                    perfumesListDiv.innerHTML = `
+                        <div class="loading">
+                            Nenhum perfume configurado para monitoramento.<br>
+                            Configure perfumes na aplicação Windows Forms ou através da API.
+                        </div>
+                    `;
+                    return;
+                }
+
+                perfumesListDiv.innerHTML = perfumes.map((perfume, index) => {
+                    let cardClass = 'status-card';
+                    let statusClass = 'perfume-status';
+                    let statusText = perfume.lastStatus;
+
+                    if (perfume.lastStatus.toLowerCase().includes('erro')) {
+                        cardClass += ' error';
+                        statusClass += ' status-error';
+                    } else if (perfume.isAvailable) {
+                        cardClass += ' available';
+                        statusClass += ' status-available';
+                    } else {
+                        cardClass += ' unavailable';
+                        statusClass += ' status-unavailable';
+                    }
+
+                    const lastChecked = new Date(perfume.lastChecked).toLocaleString('pt-BR');
+                    const lastNotification = perfume.lastWhatsAppNotification && perfume.lastWhatsAppNotification !== '0001-01-01T00:00:00' 
+                        ? new Date(perfume.lastWhatsAppNotification).toLocaleString('pt-BR')
+                        : 'Nunca';
+
+                    return `
+                        <div class="${cardClass}">
+                            <div class="perfume-name">${perfume.name}</div>
+                            <div class="${statusClass}">${statusText}</div>
+                            <div class="perfume-details">
+                                <p><strong>URL:</strong> <a href="${perfume.url}" target="_blank" class="perfume-url">${perfume.url}</a></p>
+                                <p><strong>Última verificação:</strong> ${lastChecked}</p>
+                                <p><strong>Última notificação:</strong> ${lastNotification}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Erro ao carregar perfumes:', error);
+                document.getElementById('perfumesList').innerHTML = `
+                    <div class="loading">Erro ao carregar perfumes. Verifique se o servidor está funcionando.</div>
+                `;
+            }
+        }
+
+        loadData();
+        
+        // Atualizar dados a cada 5 segundos quando estiver verificando, 30 segundos quando não estiver
+        let updateInterval = 30000;
+        
+        function scheduleNextUpdate() {
+            setTimeout(async () => {
+                try {
+                    // Cache busting para verificação de status
+                    const cacheBuster = Date.now();
+                    const response = await fetch(`/api/config/status?_=${cacheBuster}`);
+                    const status = await response.json();
+                    
+                    // Se estiver verificando, atualizar mais frequentemente
+                    if (status.isCheckingNow) {
+                        updateInterval = 3000; // 3 segundos
+                        await loadData();
+                    } else {
+                        updateInterval = 30000; // 30 segundos
+                        await loadData();
+                    }
+                } catch (error) {
+                    console.error('Erro ao verificar status:', error);
+                    updateInterval = 30000;
+                }
+                
+                scheduleNextUpdate();
+            }, updateInterval);
+        }
+        
+        scheduleNextUpdate();
+
+        async function forceCheck() {
+            try {
+                const button = event.target;
+                button.disabled = true;
+                button.innerHTML = '⏳';
+                button.title = 'Verificando...';
+
+                const response = await fetch('/api/perfumes/check-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Verificação forçada iniciada:', result);
+                    
+                    // Imediatamente começar a atualizar mais frequentemente
+                    updateInterval = 1000; // 1 segundo
+                    await loadData();
+                } else {
+                    console.error('Erro ao iniciar verificação:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Erro ao forçar verificação:', error);
+            } finally {
+                setTimeout(() => {
+                    const button = document.querySelector('button[onclick="forceCheck()"]');
+                    if (button) {
+                        button.disabled = false;
+                        button.innerHTML = '🔍';
+                        button.title = 'Verificar Agora';
+                    }
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html> 
