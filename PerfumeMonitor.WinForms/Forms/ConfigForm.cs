@@ -1,4 +1,4 @@
-using PerfumeMonitor.Models;
+using PerfumeMonitor.Shared.Models;
 using PerfumeMonitor.Services;
 
 namespace PerfumeMonitor.Forms

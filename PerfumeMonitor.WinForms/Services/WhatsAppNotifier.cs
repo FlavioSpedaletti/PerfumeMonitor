@@ -1,10 +1,11 @@
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
-using PerfumeMonitor.Models;
+using PerfumeMonitor.Shared.Interfaces;
+using PerfumeMonitor.Shared.Models;
 
 namespace PerfumeMonitor.Services
 {
-    public class WhatsAppNotifier
+    public class WhatsAppNotifier : IWhatsAppNotifier
     {
         private readonly string _accountSid;
         private readonly string _authToken;
@@ -21,8 +22,8 @@ namespace PerfumeMonitor.Services
         {
             _accountSid = credentials.AccountSid;
             _authToken = credentials.AuthToken;
-            _fromNumber = credentials.FromNumber;
-            _toNumber = credentials.ToNumber;
+            _fromNumber = credentials.FromPhoneNumber;
+            _toNumber = credentials.ToPhoneNumber;
             _isEnabled = config.IsEnabled;
             _maxDailyNotifications = config.MaxDailyNotifications;
             _cooldownMinutes = config.CooldownMinutes;
@@ -36,7 +37,7 @@ namespace PerfumeMonitor.Services
             ResetCounterIfNewDay();
         }
 
-        public async Task<bool> SendNotificationAsync(PerfumeUrl perfume)
+        public async Task<bool> SendNotificationAsync(PerfumeUrl perfume, WhatsAppConfig config)
         {
             if (!_isEnabled || string.IsNullOrEmpty(_toNumber) || string.IsNullOrEmpty(_fromNumber))
             {
@@ -45,7 +46,7 @@ namespace PerfumeMonitor.Services
 
             ResetCounterIfNewDay();
 
-            if (!ShouldSendNotification(perfume))
+            if (!CanSendNotification(perfume, config))
             {
                 System.Diagnostics.Debug.WriteLine($"Notificação WhatsApp bloqueada para {perfume.Name} - limite/cooldown");
                 return false;
@@ -81,20 +82,32 @@ namespace PerfumeMonitor.Services
             }
         }
 
-        private bool ShouldSendNotification(PerfumeUrl perfume)
+        public async Task<bool> SendNotificationAsync(PerfumeUrl perfume)
         {
-            if (_todayNotificationCount >= _maxDailyNotifications)
+            var config = new WhatsAppConfig
+            {
+                IsEnabled = _isEnabled,
+                MaxDailyNotifications = _maxDailyNotifications,
+                CooldownMinutes = _cooldownMinutes,
+                ReduceNightTimeChecks = _reduceNightTimeChecks
+            };
+            return await SendNotificationAsync(perfume, config);
+        }
+
+        public bool CanSendNotification(PerfumeUrl perfume, WhatsAppConfig config)
+        {
+            if (_todayNotificationCount >= config.MaxDailyNotifications)
             {
                 return false;
             }
 
             var timeSinceLastNotification = DateTime.Now - perfume.LastWhatsAppNotification;
-            if (timeSinceLastNotification.TotalMinutes < _cooldownMinutes)
+            if (timeSinceLastNotification.TotalMinutes < config.CooldownMinutes)
             {
                 return false;
             }
 
-            if (_reduceNightTimeChecks)
+            if (config.ReduceNightTimeChecks)
             {
                 var currentHour = DateTime.Now.Hour;
                 if (currentHour >= 1 && currentHour <= 6)
@@ -104,6 +117,18 @@ namespace PerfumeMonitor.Services
             }
 
             return true;
+        }
+
+        private bool ShouldSendNotification(PerfumeUrl perfume)
+        {
+            var config = new WhatsAppConfig
+            {
+                IsEnabled = _isEnabled,
+                MaxDailyNotifications = _maxDailyNotifications,
+                CooldownMinutes = _cooldownMinutes,
+                ReduceNightTimeChecks = _reduceNightTimeChecks
+            };
+            return CanSendNotification(perfume, config);
         }
 
         private void ResetCounterIfNewDay()

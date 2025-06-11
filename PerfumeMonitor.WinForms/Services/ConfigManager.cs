@@ -1,11 +1,49 @@
 using Newtonsoft.Json;
-using PerfumeMonitor.Models;
+using PerfumeMonitor.Shared.Interfaces;
+using PerfumeMonitor.Shared.Models;
 
 namespace PerfumeMonitor.Services
 {
-    public class ConfigManager
+    public class ConfigManager : IConfigManager
     {
-        private readonly string _configPath = "config.json";
+        private readonly string _configPath;
+        private readonly string _credentialsPath;
+
+        public ConfigManager()
+        {
+            // Buscar no diretório raiz do projeto
+            var currentDir = Directory.GetCurrentDirectory();
+            var projectRoot = currentDir;
+            
+            // Subir até encontrar a raiz do projeto (onde está o arquivo .sln)
+            while (!string.IsNullOrEmpty(projectRoot) && !File.Exists(Path.Combine(projectRoot, "PerfumeMonitor.sln")))
+            {
+                var parent = Path.GetDirectoryName(projectRoot);
+                if (parent == projectRoot) break; // Chegou na raiz do sistema
+                projectRoot = parent ?? "";
+            }
+            
+            _configPath = Path.Combine(projectRoot, "config.json");
+            _credentialsPath = Path.Combine(projectRoot, "twilio-credentials.json");
+            
+            System.Diagnostics.Debug.WriteLine($"ConfigManager usando config: {_configPath}");
+            System.Diagnostics.Debug.WriteLine($"ConfigManager usando credentials: {_credentialsPath}");
+        }
+
+        public async Task<AppConfig> LoadConfigAsync()
+        {
+            return await Task.Run(() => LoadConfig());
+        }
+
+        public async Task SaveConfigAsync(AppConfig config)
+        {
+            await Task.Run(() => SaveConfig(config));
+        }
+
+        public async Task<TwilioCredentials?> LoadTwilioCredentialsAsync()
+        {
+            return await Task.Run(() => LoadTwilioCredentials());
+        }
 
         public AppConfig LoadConfig()
         {
@@ -13,7 +51,9 @@ namespace PerfumeMonitor.Services
             {
                 if (!File.Exists(_configPath))
                 {
-                    return GetDefaultConfig();
+                    var defaultConfig = GetDefaultConfig();
+                    SaveConfig(defaultConfig);
+                    return defaultConfig;
                 }
 
                 var json = File.ReadAllText(_configPath);
@@ -36,6 +76,24 @@ namespace PerfumeMonitor.Services
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao salvar configuração: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public TwilioCredentials? LoadTwilioCredentials()
+        {
+            try
+            {
+                if (!File.Exists(_credentialsPath))
+                {
+                    return null;
+                }
+
+                var json = File.ReadAllText(_credentialsPath);
+                return JsonConvert.DeserializeObject<TwilioCredentials>(json);
+            }
+            catch
+            {
+                return null;
             }
         }
 
