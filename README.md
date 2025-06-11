@@ -1,6 +1,30 @@
 # Monitor de Perfumes
 
+Solução modular para monitoramento de produtos com múltiplas aplicações.
+
+## 📁 Estrutura do Projeto
+
+```
+PerfumeMonitor/
+├── PerfumeMonitor.WinForms/    # Aplicação Windows Forms (atual)
+│   ├── Forms/                  # Formulários da aplicação
+│   ├── Services/              # Serviços (checagem, notificações)
+│   ├── Models/                # Modelos de dados
+│   ├── config.json            # Configurações da aplicação
+│   └── Program.cs             # Ponto de entrada
+├── docs/                      # Documentação (futuros projetos)
+└── README.md                  # Este arquivo
+```
+
+## 🎯 Aplicações Disponíveis
+
+### PerfumeMonitor.WinForms
 Aplicação Windows Forms que monitora automaticamente a disponibilidade de perfumes em sites específicos com notificações WhatsApp.
+
+### Projetos Futuros
+- **PerfumeMonitor.WebApi**: API REST para monitoramento via web
+- **PerfumeMonitor.Service**: Serviço Windows para execução em background
+- **PerfumeMonitor.Web**: Interface web para gerenciamento remoto
 
 ## 🚀 Funcionalidades
 
@@ -25,10 +49,11 @@ Aplicação Windows Forms que monitora automaticamente a disponibilidade de perf
 
 ## 🔧 Como usar
 
-### Configuração inicial
-1. **Execução**: Ao iniciar, a aplicação vai para o system tray (ícone na bandeja)
-2. **URLs**: Clique com botão direito → "Configurações" para gerenciar produtos
-3. **WhatsApp**: Clique com botão direito → "WhatsApp" para configurar notificações
+### PerfumeMonitor.WinForms
+1. **Compilação**: Abra `PerfumeMonitor.sln` no Visual Studio ou compile via CLI
+2. **Execução**: Ao iniciar, a aplicação vai para o system tray (ícone na bandeja)
+3. **URLs**: Clique com botão direito → "Configurações" para gerenciar produtos
+4. **WhatsApp**: Clique com botão direito → "WhatsApp" para configurar notificações
 
 ### Configuração WhatsApp (Opcional)
 Para receber notificações no WhatsApp:
