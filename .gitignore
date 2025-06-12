@@ -395,3 +395,4 @@ twilio-credentials.json
 # Logs
 *.log 
 PerfumeMonitor.WinForms/nul
+nul

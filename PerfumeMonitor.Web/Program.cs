@@ -1,6 +1,7 @@
 using PerfumeMonitor.Shared.Interfaces;
 using PerfumeMonitor.Web.Services;
 using PerfumeMonitor.Web.Middleware;
+using PerfumeMonitor.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,4 +1,5 @@
 using PerfumeMonitor.Shared.Models;
+using PerfumeMonitor.Shared.Services;
 using PerfumeMonitor.Services;
 
 namespace PerfumeMonitor.Forms
@@ -189,11 +190,20 @@ namespace PerfumeMonitor.Forms
 
             try
             {
-                await _whatsAppNotifier.SendNotificationAsync(perfume);
+                var success = await _whatsAppNotifier.SendNotificationAsync(perfume);
+                if (success)
+                {
+                    System.Diagnostics.Debug.WriteLine($"WhatsApp enviado com sucesso para {perfume.Name}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Falha ao enviar WhatsApp para {perfume.Name}");
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Erro ao enviar WhatsApp: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Erro ao enviar WhatsApp para {perfume.Name}: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
             }
 
             if (this.InvokeRequired)

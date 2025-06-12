@@ -2,7 +2,7 @@ using HtmlAgilityPack;
 using PerfumeMonitor.Shared.Interfaces;
 using PerfumeMonitor.Shared.Models;
 
-namespace PerfumeMonitor.Services
+namespace PerfumeMonitor.Shared.Services
 {
     public class PerfumeChecker : IPerfumeChecker
     {
@@ -20,7 +20,7 @@ namespace PerfumeMonitor.Services
             try
             {
                 var html = await _httpClient.GetStringAsync(perfume.Url);
-                var doc = new HtmlAgilityPack.HtmlDocument();
+                var doc = new HtmlDocument();
                 doc.LoadHtml(html);
 
                 bool isAvailable = IsProductAvailable(doc);
@@ -38,7 +38,7 @@ namespace PerfumeMonitor.Services
             }
         }
 
-        private bool IsProductAvailable(HtmlAgilityPack.HtmlDocument doc)
+        private bool IsProductAvailable(HtmlDocument doc)
         {
             var buyButton = doc.DocumentNode.SelectSingleNode("//input[@type='submit' and contains(@class, 'product-buy-btn')]");
             
